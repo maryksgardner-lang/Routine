@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Routine</title>
+<style>
+  :root{
+    --bg: #F6F5F1;
+    --card: #FFFFFF;
+    --line: #E4E1D8;
+    --ink: #2B2A26;
+    --ink-soft: #706C60;
+    --sage: #6B7A63;
+    --sage-light: #E7ECE3;
+    --dusk: #7288A0;
+    --dusk-light: #E7EDF2;
+    --done-bg: #F0F3ED;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 80px;
+  }
+  .wrap{ max-width: 560px; margin: 0 auto; }
+
+  header{ margin-bottom: 28px; }
+  .eyebrow{
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sage);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .day-tabs{
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .day-tab{
+    flex: 1 0 auto;
+    min-width: 44px;
+    text-align: center;
+    padding: 10px 6px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .day-tab .pct{
+    display: block;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+  .day-tab.active{
+    background: var(--sage);
+    border-color: var(--sage);
+    color: #fff;
+  }
+  .day-tab.active .pct{ color: #fff; opacity: 0.85; }
+  .day-tab.today:not(.active){ border-color: var(--sage); }
+
+  .progress-line{
+    display:flex; align-items:center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .progress-line .label{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .progress-line .count{
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .block{ margin-bottom: 22px; }
+  .block-title{
+    display:flex; align-items:center; gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dusk);
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+  .block-title::before{
+    content:'';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--dusk);
+    display: inline-block;
+  }
+
+  .task{
+    display:flex; align-items:center; gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .task.done{
+    background: var(--done-bg);
+    border-color: var(--sage-light);
+  }
+  .task input{
+    width: 18px; height: 18px;
+    accent-color: var(--sage);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .task .icon{
+    font-size: 16px;
+    flex-shrink: 0;
+    color: var(--ink-soft);
+    width: 20px;
+    text-align: center;
+  }
+  .task .text{
+    flex: 1;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .task.done .text{
+    color: var(--ink-soft);
+    text-decoration: line-through;
+  }
+
+  footer{
+    text-align: center;
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Home & habits</div>
+    <h1>Daily routine</h1>
+  </header>
+
+  <div class="day-tabs" id="dayTabs"></div>
+  <div class="progress-line">
+    <span class="label" id="dayLabel"></span>
+    <span class="count" id="dayCount"></span>
+  </div>
+  <div id="blocks"></div>
+
+  <footer>Saved on this device · check today, and tomorrow starts fresh</footer>
+</div>
+
+<script>
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const weekday = [
+  { time:'Morning', tasks:[
+    {id:'bed', label:'Make bed + wipe counters', icon:'&#9737;'},
+    {id:'laundry', label:'Start a load of laundry', icon:'&#9987;'}
+  ]},
+  { time:'Midday', tasks:[
+    {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'&#9679;'}
+  ]},
+  { time:'Evening', tasks:[
+    {id:'fold', label:'Fold + put away laundry', icon:'&#9987;'},
+    {id:'workout', label:'Workout', icon:'&#9650;'}
+  ]},
+  { time:'Night', tasks:[
+    {id:'read', label:'Read before bed', icon:'&#9776;'}
+  ]}
+];
+
+const saturday = [
+  { time:'Morning', tasks:[
+    {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'&#9737;'}
+  ]},
+  { time:'Afternoon', tasks:[
+    {id:'workout', label:'Workout', icon:'&#9650;'}
+  ]},
+  { time:'Night', tasks:[
+    {id:'read', label:'Read', icon:'&#9776;'}
+  ]}
+];
+
+const sunday = [
+  { time:'Morning', tasks:[
+    {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'&#9776;'}
+  ]},
+  { time:'Afternoon', tasks:[
+    {id:'declutter_deep', label:'Longer declutter session', icon:'&#9679;'},
+    {id:'pool', label:'Pool / relax', icon:'&#8776;'}
+  ]},
+  { time:'Night', tasks:[
+    {id:'read', label:'Read', icon:'&#9776;'}
+  ]}
+];
+
+function blocksFor(dow){
+  if(dow===6) return saturday;
+  if(dow===0) return sunday;
+  return weekday;
+}
+function fmt(d){ return d.toISOString().slice(0,10); }
+
+const today = new Date();
+const todayStr = fmt(today);
+const monOffset = (today.getDay()+6)%7;
+const monday = new Date(today); monday.setDate(today.getDate()-monOffset);
+const weekDates = [];
+for(let i=0;i<7;i++){ const d = new Date(monday); d.setDate(monday.getDate()+i); weekDates.push(d); }
+
+let active = todayStr;
+
+function load(dateStr){
+  try{
+    const raw = localStorage.getItem('routine:'+dateStr);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function save(dateStr, state){
+  try{ localStorage.setItem('routine:'+dateStr, JSON.stringify(state)); }
+  catch(e){ console.error('save failed', e); }
+}
+function pct(dateStr, dow){
+  const blocks = blocksFor(dow);
+  const allTasks = blocks.flatMap(b => b.tasks);
+  const st = load(dateStr);
+  const done = allTasks.filter(t => st[t.id]).length;
+  return allTasks.length ? Math.round((done/allTasks.length)*100) : 0;
+}
+
+function renderTabs(){
+  const el = document.getElementById('dayTabs');
+  el.innerHTML = weekDates.map(d => {
+    const ds = fmt(d);
+    const isActive = ds === active;
+    const isToday = ds === todayStr;
+    return `<div class="day-tab ${isActive?'active':''} ${isToday?'today':''}" data-date="${ds}">
+      ${DAY_NAMES[d.getDay()]}
+      <span class="pct">${pct(ds, d.getDay())}%</span>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.day-tab').forEach(t => {
+    t.onclick = () => { active = t.dataset.date; renderAll(); };
+  });
+}
+
+function renderBody(){
+  const activeDate = new Date(active+'T00:00:00');
+  const dow = activeDate.getDay();
+  const blocks = blocksFor(dow);
+  const st = load(active);
+  const allTasks = blocks.flatMap(b => b.tasks);
+  const done = allTasks.filter(t => st[t.id]).length;
+
+  const dayTitle = dow===6 ? 'Saturday' : dow===0 ? 'Sunday' : 'Weekday';
+  document.getElementById('dayLabel').textContent = dayTitle + (active===todayStr ? ' · today' : '');
+  document.getElementById('dayCount').textContent = `${done} / ${allTasks.length} done`;
+
+  document.getElementById('blocks').innerHTML = blocks.map(b => `
+    <div class="block">
+      <div class="block-title">${b.time}</div>
+      ${b.tasks.map(t => `
+        <div class="task ${st[t.id]?'done':''}" data-task="${t.id}">
+          <input type="checkbox" ${st[t.id]?'checked':''} data-task-cb="${t.id}">
+          <span class="icon">${t.icon}</span>
+          <span class="text">${t.label}</span>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.task').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if(e.target.tagName === 'INPUT') return;
+      const cb = row.querySelector('input');
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event('change'));
+    });
+  });
+  document.querySelectorAll('[data-task-cb]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const s = load(active);
+      s[cb.dataset.taskCb] = cb.checked;
+      save(active, s);
+      renderAll();
+    });
+  });
+}
+
+function renderAll(){ renderTabs(); renderBody(); }
+renderAll();
+</script>
+</body>
+</html>
