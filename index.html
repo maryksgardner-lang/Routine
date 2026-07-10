@@ -4,18 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Routine</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FDF3F5'/%3E%3Ctext x='50' y='62' font-size='55' text-anchor='middle'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FDF3F5'/%3E%3Ctext x='50' y='62' font-size='55' text-anchor='middle'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --bg: #F6F5F1;
+    --bg: #FDF3F5;
     --card: #FFFFFF;
-    --line: #E4E1D8;
-    --ink: #2B2A26;
-    --ink-soft: #706C60;
-    --sage: #6B7A63;
-    --sage-light: #E7ECE3;
-    --dusk: #7288A0;
-    --dusk-light: #E7EDF2;
-    --done-bg: #F0F3ED;
+    --line: #F3DCE1;
+    --ink: #402A30;
+    --ink-soft: #8C6B72;
+    --sage: #D46A87;
+    --sage-light: #FBE6EC;
+    --dusk: #C14F72;
+    --dusk-light: #FBE6EC;
+    --done-bg: #FDEEF1;
   }
   *{ box-sizing: border-box; }
   body{
@@ -135,10 +137,9 @@
     cursor: pointer;
   }
   .task .icon{
-    font-size: 16px;
+    font-size: 18px;
     flex-shrink: 0;
-    color: var(--ink-soft);
-    width: 20px;
+    width: 22px;
     text-align: center;
   }
   .task .text{
@@ -181,43 +182,43 @@ const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 const weekday = [
   { time:'Morning', tasks:[
-    {id:'bed', label:'Make bed + wipe counters', icon:'&#9737;'},
-    {id:'laundry', label:'Start a load of laundry', icon:'&#9987;'}
+    {id:'bed', label:'Make bed + wipe counters', icon:'🛏️'},
+    {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
   ]},
   { time:'Midday', tasks:[
-    {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'&#9679;'}
+    {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'},
+    {id:'workout', label:'Workout', icon:'🏃'}
   ]},
   { time:'Evening', tasks:[
-    {id:'fold', label:'Fold + put away laundry', icon:'&#9987;'},
-    {id:'workout', label:'Workout', icon:'&#9650;'}
+    {id:'fold', label:'Fold + put away laundry', icon:'👕'}
   ]},
   { time:'Night', tasks:[
-    {id:'read', label:'Read before bed', icon:'&#9776;'}
+    {id:'read', label:'Read before bed', icon:'📖'}
   ]}
 ];
 
 const saturday = [
   { time:'Morning', tasks:[
-    {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'&#9737;'}
+    {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'🧽'}
   ]},
   { time:'Afternoon', tasks:[
-    {id:'workout', label:'Workout', icon:'&#9650;'}
+    {id:'workout', label:'Workout', icon:'🏃'}
   ]},
   { time:'Night', tasks:[
-    {id:'read', label:'Read', icon:'&#9776;'}
+    {id:'read', label:'Read', icon:'📖'}
   ]}
 ];
 
 const sunday = [
   { time:'Morning', tasks:[
-    {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'&#9776;'}
+    {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'🧾'}
   ]},
   { time:'Afternoon', tasks:[
-    {id:'declutter_deep', label:'Longer declutter session', icon:'&#9679;'},
-    {id:'pool', label:'Pool / relax', icon:'&#8776;'}
+    {id:'declutter_deep', label:'Longer declutter session', icon:'🧹'},
+    {id:'pool', label:'Pool / relax', icon:'🏊'}
   ]},
   { time:'Night', tasks:[
-    {id:'read', label:'Read', icon:'&#9776;'}
+    {id:'read', label:'Read', icon:'📖'}
   ]}
 ];
 
