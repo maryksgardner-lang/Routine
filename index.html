@@ -227,7 +227,12 @@ function blocksFor(dow){
   if(dow===0) return sunday;
   return weekday;
 }
-function fmt(d){ return d.toISOString().slice(0,10); }
+function fmt(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 
 const today = new Date();
 const todayStr = fmt(today);
