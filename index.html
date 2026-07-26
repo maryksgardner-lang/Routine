@@ -180,52 +180,84 @@
 <script>
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-const weekday = [
-  { time:'Morning', tasks:[
-    {id:'bed', label:'Make bed + wipe counters', icon:'🛏️'},
-    {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
-  ]},
-  { time:'Midday', tasks:[
-    {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'},
-    {id:'workout', label:'Workout', icon:'🏃'}
-  ]},
-  { time:'Evening', tasks:[
-    {id:'fold', label:'Fold + put away laundry', icon:'👕'}
-  ]},
-  { time:'Night', tasks:[
-    {id:'read', label:'Read before bed', icon:'📖'}
-  ]}
-];
-
-const saturday = [
-  { time:'Morning', tasks:[
-    {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'🧽'}
-  ]},
-  { time:'Afternoon', tasks:[
-    {id:'workout', label:'Workout', icon:'🏃'}
-  ]},
-  { time:'Night', tasks:[
-    {id:'read', label:'Read', icon:'📖'}
-  ]}
-];
-
-const sunday = [
-  { time:'Morning', tasks:[
-    {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'🧾'}
-  ]},
-  { time:'Afternoon', tasks:[
-    {id:'declutter_deep', label:'Longer declutter session', icon:'🧹'},
-    {id:'pool', label:'Pool / relax', icon:'🏊'}
-  ]},
-  { time:'Night', tasks:[
-    {id:'read', label:'Read', icon:'📖'}
-  ]}
-];
+// 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+const schedule = {
+  1: [ // Monday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'}
+    ]},
+    { time:'Midday', tasks:[
+      {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'}
+    ]}
+  ],
+  2: [ // Tuesday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
+      {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
+    ]},
+    { time:'Midday', tasks:[
+      {id:'workout', label:'Workout', icon:'🏃'}
+    ]},
+    { time:'Evening', tasks:[
+      {id:'fold', label:'Fold + put away laundry', icon:'👕'}
+    ]}
+  ],
+  3: [ // Wednesday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'}
+    ]},
+    { time:'Midday', tasks:[
+      {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'}
+    ]}
+  ],
+  4: [ // Thursday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
+      {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
+    ]},
+    { time:'Midday', tasks:[
+      {id:'workout', label:'Workout', icon:'🏃'}
+    ]},
+    { time:'Evening', tasks:[
+      {id:'fold', label:'Fold + put away laundry', icon:'👕'}
+    ]}
+  ],
+  5: [ // Friday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'}
+    ]},
+    { time:'Midday', tasks:[
+      {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'}
+    ]}
+  ],
+  6: [ // Saturday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
+      {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'🧽'},
+      {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
+    ]},
+    { time:'Afternoon', tasks:[
+      {id:'workout', label:'Workout', icon:'🏃'}
+    ]},
+    { time:'Evening', tasks:[
+      {id:'fold', label:'Fold + put away laundry', icon:'👕'}
+    ]}
+  ],
+  0: [ // Sunday
+    { time:'Morning', tasks:[
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
+      {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'🧾'}
+    ]},
+    { time:'Afternoon', tasks:[
+      {id:'declutter_deep', label:'Longer declutter session', icon:'🧹'},
+      {id:'social', label:'Social media posts', icon:'📱'},
+      {id:'pool', label:'Pool / relax', icon:'🏊'}
+    ]}
+  ]
+};
 
 function blocksFor(dow){
-  if(dow===6) return saturday;
-  if(dow===0) return sunday;
-  return weekday;
+  return schedule[dow];
 }
 function fmt(d){
   const y = d.getFullYear();
@@ -285,7 +317,8 @@ function renderBody(){
   const allTasks = blocks.flatMap(b => b.tasks);
   const done = allTasks.filter(t => st[t.id]).length;
 
-  const dayTitle = dow===6 ? 'Saturday' : dow===0 ? 'Sunday' : 'Weekday';
+  const FULL_DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dayTitle = FULL_DAY_NAMES[dow];
   document.getElementById('dayLabel').textContent = dayTitle + (active===todayStr ? ' · today' : '');
   document.getElementById('dayCount').textContent = `${done} / ${allTasks.length} done`;
 
