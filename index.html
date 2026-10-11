@@ -188,6 +188,9 @@ const schedule = {
     ]},
     { time:'Midday', tasks:[
       {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'}
+    ]},
+    { time:'Afternoon', tasks:[
+      {id:'crockpot', label:'Start crockpot', icon:'🍲'}
     ]}
   ],
   2: [ // Tuesday
@@ -234,30 +237,40 @@ const schedule = {
     { time:'Morning', tasks:[
       {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
       {id:'deepclean', label:'Deep clean (bathrooms, floors)', icon:'🧽'},
-      {id:'laundry', label:'Start a load of laundry', icon:'🧺'}
-    ]},
-    { time:'Afternoon', tasks:[
-      {id:'workout', label:'Workout', icon:'🏃'}
-    ]},
-    { time:'Evening', tasks:[
-      {id:'fold', label:'Fold + put away laundry', icon:'👕'}
+      {id:'laundry', label:'Start a load of laundry', icon:'🧺'},
+      {id:'fold', label:'Fold + put away laundry', icon:'👕'},
+      {id:'declutter', label:'15–30 min declutter (pick your spot)', icon:'🧹'}
     ]}
   ],
   0: [ // Sunday
     { time:'Morning', tasks:[
-      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'},
-      {id:'tax', label:'Weekly tax block (1–2 hrs)', icon:'🧾'},
-      {id:'social', label:'Social media posts', icon:'📱'}
+      {id:'dishwasher', label:'Start dishwasher', icon:'🍽️'}
     ]},
     { time:'Afternoon', tasks:[
       {id:'declutter_deep', label:'Longer declutter session', icon:'🧹'},
-      {id:'pool', label:'Pool / relax', icon:'🏊'}
+      {id:'football', label:'Football', icon:'🏈'}
     ]}
   ]
 };
 
-function blocksFor(dow){
-  return schedule[dow];
+// Social media posts: first and last Sunday of each month only
+const socialTasks = [
+  {id:'social_ra', label:'Social media posts: Red Aspen', icon:'📱'},
+  {id:'social_self', label:'Social media posts: Self Care with Mary', icon:'📱'},
+  {id:'social_va', label:'Social media posts: Virtual Assistant', icon:'📱'}
+];
+function isSocialSunday(d){
+  if(d.getDay() !== 0) return false;
+  const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  return d.getDate() <= 7 || d.getDate() + 7 > daysInMonth;
+}
+
+function blocksFor(d){
+  const base = schedule[d.getDay()];
+  if(!isSocialSunday(d)) return base;
+  return base.map(b => b.time === 'Morning'
+    ? { time: b.time, tasks: b.tasks.concat(socialTasks) }
+    : b);
 }
 function fmt(d){
   const y = d.getFullYear();
@@ -285,8 +298,8 @@ function save(dateStr, state){
   try{ localStorage.setItem('routine:'+dateStr, JSON.stringify(state)); }
   catch(e){ console.error('save failed', e); }
 }
-function pct(dateStr, dow){
-  const blocks = blocksFor(dow);
+function pct(dateStr, d){
+  const blocks = blocksFor(d);
   const allTasks = blocks.flatMap(b => b.tasks);
   const st = load(dateStr);
   const done = allTasks.filter(t => st[t.id]).length;
@@ -301,7 +314,7 @@ function renderTabs(){
     const isToday = ds === todayStr;
     return `<div class="day-tab ${isActive?'active':''} ${isToday?'today':''}" data-date="${ds}">
       ${DAY_NAMES[d.getDay()]}
-      <span class="pct">${pct(ds, d.getDay())}%</span>
+      <span class="pct">${pct(ds, d)}%</span>
     </div>`;
   }).join('');
   el.querySelectorAll('.day-tab').forEach(t => {
@@ -312,7 +325,7 @@ function renderTabs(){
 function renderBody(){
   const activeDate = new Date(active+'T00:00:00');
   const dow = activeDate.getDay();
-  const blocks = blocksFor(dow);
+  const blocks = blocksFor(activeDate);
   const st = load(active);
   const allTasks = blocks.flatMap(b => b.tasks);
   const done = allTasks.filter(t => st[t.id]).length;
